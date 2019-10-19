@@ -1,5 +1,4 @@
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.Scanner;
 
@@ -7,16 +6,33 @@ public class rsa_keygen {
 
 
     public static void main(String[] args) {
-        rsa_keygen x =new rsa_keygen();
+
+        if (args.length < 3) {
+            System.err.println("Usage:  rsa_keygen infile outfile1 outfile2");
+            System.exit(-1);
+        }
+        rsa_keygen keygen = new rsa_keygen();
 //        BigInteger test_val_1 = new BigInteger("15");
 //        BigInteger test_val_2 = new BigInteger("3");
 //        BigInteger test_val_3 = new BigInteger("5");
-        BigInteger[] values = x.readInValues(args[0]);
+        BigInteger[] values = keygen.readInValues(args[0]);
         BigInteger p = values[0];
         BigInteger q = values[1];
+        BigInteger x = values[2];
         BigInteger n = p.multiply(q);
         BigInteger fn = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1")));
-        System.out.println(x.isPrime(fn,values[2]));
+        if (!keygen.isPrime(fn, x)) {
+            System.err.println("Unsuitable exponent\n");
+            System.exit(-1);
+        }
+        BigInteger y = keygen.modInverse( x, fn);
+        keygen.printValues(n, x, y, args[1], args[2]);
+
+
+//        System.out.println(x.modInverse(fn) + "done");
+//        System.out.println(keygen.modInverse(x, fn));
+
+//        System.out.println(x.multiply(keygen.modInverse(x, fn)).mod(fn));
 //        System.out.println(x.isPrime((test_val_1), test_val_2, test_val_3));
     }
 
@@ -51,7 +67,7 @@ public class rsa_keygen {
      * @param infile The input file containing p, q and x
      * @return a BigInteger array containing the 3 numbers from an input file. Null on a failure.
      */
-    private BigInteger[] readInValues(String infile) {
+    public BigInteger[] readInValues(String infile) {
         try {
             String[] numbers = new String[3];
             BigInteger[] values = new BigInteger[3];
@@ -63,10 +79,59 @@ public class rsa_keygen {
             }
             return values;
         } catch (FileNotFoundException e) {
-            System.out.println("Unsuitable exponent\n");
+            System.err.println("Unsuitable exponent\n");
             System.exit(-1);
         }
         return null;
     }
+
+    /**
+     * This method should identify the modular inverse of a number using extended euclidean algorithm.
+     * i.e. it finds a^-1 mod b
+     * @param a the number whose modular inverse needs to be found
+     * @param mod the mod value
+     * @return the modular inverse of a
+     */
+    public BigInteger modInverse(BigInteger a, BigInteger mod) {
+        BigInteger originalMod =  new BigInteger(mod.toByteArray());
+        BigInteger y = new BigInteger("0");
+        BigInteger x = new BigInteger(("1")); // will hold the modular inverse
+
+        if (mod.equals(new BigInteger("1"))) {
+            return new BigInteger("0");
+        }
+        /* this while loop iteratively does the euclidean algorithm while updating
+        a value 'x' that will eventually be the modular inverse of a */
+        while (a.compareTo(new BigInteger("1")) == 1) {
+            BigInteger quotient = a.divide(mod);
+            BigInteger t = mod;
+
+            mod = a.mod(mod);
+            a = t;
+            t = y;
+
+            y = x.subtract(quotient.multiply(y));
+            x = t;
+        }
+        if (x.compareTo(new BigInteger("0")) == -1) {
+            x = x.add(originalMod);
+        }
+        return x;
+    }
+
+    public void printValues(BigInteger pq, BigInteger x, BigInteger y, String outfile1, String outfile2) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outfile1));
+            BufferedWriter writer2 = new BufferedWriter(new FileWriter(outfile2));
+            writer.write(pq.toString() + "\n" + x.toString());
+            writer2.write(pq.toString() + "\n" + y.toString());
+            writer.close();
+            writer2.close();
+        } catch (IOException e) {
+
+        }
+
+    }
+
 
 }
