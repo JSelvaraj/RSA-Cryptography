@@ -7,23 +7,27 @@ public class rsa_keygen {
 
 
     public static void main(String[] args) {
-//        rsa_keygen x =new rsa_keygen();
-        BigInteger test_val_1 = new BigInteger("15");
-        BigInteger[] values = readInValues(args[0]);
-
-        System.out.println(isPrime(new BigInteger("15"), new BigInteger("3"), new BigInteger("5")));
+        rsa_keygen x =new rsa_keygen();
+//        BigInteger test_val_1 = new BigInteger("15");
+//        BigInteger test_val_2 = new BigInteger("3");
+//        BigInteger test_val_3 = new BigInteger("5");
+        BigInteger[] values = x.readInValues(args[0]);
+        BigInteger p = values[0];
+        BigInteger q = values[1];
+        BigInteger n = p.multiply(q);
+        BigInteger fn = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1")));
+        System.out.println(x.isPrime(fn,values[2]));
+//        System.out.println(x.isPrime((test_val_1), test_val_2, test_val_3));
     }
 
     /**
      * This method checks whether 2 numbers, x and (p-1)(q-1) are coprime
      * @param x operand 1
-     * @param p operand 2
-     * @param q operand 3
+     * @param n this value is equal to (p-1)(q-1)
      * @return true if e and (p-1)(q-1) are coprime and false if not
      */
-    public static boolean isPrime(BigInteger x, BigInteger p, BigInteger q) {
-        BigInteger operand_2 = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1")));
-        if(gcd(x, operand_2).equals(new BigInteger("1"))) {
+    public  boolean isPrime(BigInteger n, BigInteger x) {
+        if(gcd(x, n).equals(new BigInteger("1"))) {
             return true;
         }
         return false;
@@ -35,7 +39,7 @@ public class rsa_keygen {
      * @param b (p-1)(q-1)
      * @return The greatest common divisor between a and b
      */
-    private static BigInteger gcd(BigInteger a, BigInteger b) {
+    private BigInteger gcd(BigInteger a, BigInteger b) {
         if (a.equals(new BigInteger("0"))) {
             return b ;
         }
@@ -44,10 +48,10 @@ public class rsa_keygen {
 
     /**
      * This reads in a file containing 3 numbers, into an array of 3 BigIntegers
-     * @param infile The input file containing
-     * @return
+     * @param infile The input file containing p, q and x
+     * @return a BigInteger array containing the 3 numbers from an input file. Null on a failure.
      */
-    private static BigInteger[] readInValues(String infile) {
+    private BigInteger[] readInValues(String infile) {
         try {
             String[] numbers = new String[3];
             BigInteger[] values = new BigInteger[3];
@@ -64,7 +68,5 @@ public class rsa_keygen {
         }
         return null;
     }
-
-
 
 }
