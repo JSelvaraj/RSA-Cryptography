@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/p01-src.iml" filepath="$PROJECT_DIR$/p01-src.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RSA-Cryptography.iml" filepath="$PROJECT_DIR$/RSA-Cryptography.iml" />
     </modules>
   </component>
 </project>
