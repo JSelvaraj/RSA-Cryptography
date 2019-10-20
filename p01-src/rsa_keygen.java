@@ -41,11 +41,8 @@ public class rsa_keygen {
      * @param n this value is equal to (p-1)(q-1)
      * @return true if e and (p-1)(q-1) are coprime and false if not
      */
-    public  boolean isPrime(BigInteger n, BigInteger x) {
-        if(gcd(x, n).equals(new BigInteger("1"))) {
-            return true;
-        }
-        return false;
+    private  boolean isPrime(BigInteger n, BigInteger x) {
+        return gcd(x, n).equals(new BigInteger("1"));
     }
 
     /**
@@ -66,7 +63,7 @@ public class rsa_keygen {
      * @param infile The input file containing p, q and x
      * @return a BigInteger array containing the 3 numbers from an input file. Null on a failure.
      */
-    public BigInteger[] readInValues(String infile) {
+    private BigInteger[] readInValues(String infile) {
         try {
             String[] numbers = new String[3];
             BigInteger[] values = new BigInteger[3];
@@ -91,7 +88,7 @@ public class rsa_keygen {
      * @param mod the mod value
      * @return the modular inverse of a
      */
-    public BigInteger modInverse(BigInteger a, BigInteger mod) {
+    private BigInteger modInverse(BigInteger a, BigInteger mod) {
         BigInteger originalMod =  new BigInteger(mod.toByteArray());
         BigInteger y = new BigInteger("0");
         BigInteger x = new BigInteger(("1")); // will hold the modular inverse
@@ -101,7 +98,7 @@ public class rsa_keygen {
         }
         /* this while loop iteratively does the euclidean algorithm while updating
         a value 'x' that will eventually be the modular inverse of a */
-        while (a.compareTo(new BigInteger("1")) == 1) {
+        while (a.compareTo(new BigInteger("1")) > 0) {
             BigInteger quotient = a.divide(mod);
             BigInteger t = mod;
 
@@ -112,7 +109,7 @@ public class rsa_keygen {
             y = x.subtract(quotient.multiply(y));
             x = t;
         }
-        if (x.compareTo(new BigInteger("0")) == -1) {
+        if (x.compareTo(new BigInteger("0")) < 0) {
             x = x.add(originalMod);
         }
         return x;
@@ -126,7 +123,7 @@ public class rsa_keygen {
      * @param outfile1 the directory of the file that will contain pq and x
      * @param outfile2 the directory of the file that will contain pq and y
      */
-    public void printValues(BigInteger pq, BigInteger x, BigInteger y, String outfile1, String outfile2) {
+    private void printValues(BigInteger pq, BigInteger x, BigInteger y, String outfile1, String outfile2) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(outfile1));
             BufferedWriter writer2 = new BufferedWriter(new FileWriter(outfile2));
@@ -135,7 +132,7 @@ public class rsa_keygen {
             writer.close();
             writer2.close();
         } catch (IOException e) {
-
+            System.err.println("Files did not print correctly");
         }
 
     }

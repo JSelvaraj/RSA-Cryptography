@@ -4,7 +4,6 @@ public class rsa_code {
 
 
     public static void main(String[] args) {
-        rsa_code rsa_code = new rsa_code();
         BigInteger x = new BigInteger("16777215");
         System.out.println(findNearestPower256(x));
 
@@ -12,7 +11,6 @@ public class rsa_code {
 
     private static BigInteger findNearestPower256(BigInteger x) {
         BigInteger blockSize = new BigInteger("256");
-        BigInteger lBlockSize = new BigInteger("256");
         if (x.compareTo(blockSize) == 0) {
             return new BigInteger("1");
         }
@@ -27,7 +25,7 @@ public class rsa_code {
         }
 
         while ((upperk.subtract(lowerk)).compareTo(new BigInteger("1")) != 0) { // (upperk-lowerk) != 1
-            BigInteger tempK = new BigInteger("0");
+            BigInteger tempK;
             if (blockSize.compareTo(x) == 0) {
                 return upperk;
             } else {
@@ -35,9 +33,9 @@ public class rsa_code {
                 blockSize = get256toPowerK(tempK);
             }
             int compare = blockSize.compareTo(x);
-            if (compare == 1) {
+            if (compare >= 1) {
                 upperk = tempK;
-            } else if (compare == -1) {
+            } else if (compare <= -1) {
                 lowerk = tempK;
             } else {
                 return tempK;
