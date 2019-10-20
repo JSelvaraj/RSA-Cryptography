@@ -5,35 +5,36 @@ import java.util.Scanner;
 public class rsa_keygen {
 
     public static void main(String[] args) {
+        System.out.println(255/2);
 
-        if (args.length < 3) {
-            System.err.println("Usage:  rsa_keygen infile outfile1 outfile2");
-            System.exit(-1);
-        }
-        rsa_keygen keygen = new rsa_keygen();
-//        BigInteger test_val_1 = new BigInteger("15");
-//        BigInteger test_val_2 = new BigInteger("3");
-//        BigInteger test_val_3 = new BigInteger("5");
-        BigInteger[] values = keygen.readInValues(args[0]);
-        BigInteger p = values[0];
-        BigInteger q = values[1];
-        BigInteger x = values[2];
-        BigInteger n = p.multiply(q);
-        BigInteger fn = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1")));
-        if (!keygen.isPrime(fn, x)) {
-            System.err.println("Unsuitable exponent\n");
-            System.exit(-1);
-        }
-        BigInteger y = keygen.modInverse( x, fn);
-        keygen.printValues(n, x, y, args[1], args[2]);
-        System.exit(0);
-
-
-//        System.out.println(x.modInverse(fn) + "done");
-//        System.out.println(keygen.modInverse(x, fn));
-
-//        System.out.println(x.multiply(keygen.modInverse(x, fn)).mod(fn));
-//        System.out.println(x.isPrime((test_val_1), test_val_2, test_val_3));
+//        if (args.length < 3) {
+//            System.err.println("Usage:  rsa_keygen infile outfile1 outfile2");
+//            System.exit(-1);
+//        }
+//        rsa_keygen keygen = new rsa_keygen();
+////        BigInteger test_val_1 = new BigInteger("15");
+////        BigInteger test_val_2 = new BigInteger("3");
+////        BigInteger test_val_3 = new BigInteger("5");
+//        BigInteger[] values = keygen.readInValues(args[0]);
+//        BigInteger p = values[0];
+//        BigInteger q = values[1];
+//        BigInteger x = values[2];
+//        BigInteger n = p.multiply(q);
+//        BigInteger fn = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1")));
+//        if (!keygen.isPrime(fn, x)) {
+//            System.err.println("Unsuitable exponent\n");
+//            System.exit(-1);
+//        }
+//        BigInteger y = keygen.modInverse( x, fn);
+//        keygen.printValues(n, x, y, args[1], args[2]);
+//        System.exit(0);
+//
+//
+////        System.out.println(x.modInverse(fn) + "done");
+////        System.out.println(keygen.modInverse(x, fn));
+//
+////        System.out.println(x.multiply(keygen.modInverse(x, fn)).mod(fn));
+////        System.out.println(x.isPrime((test_val_1), test_val_2, test_val_3));
     }
 
     /**
