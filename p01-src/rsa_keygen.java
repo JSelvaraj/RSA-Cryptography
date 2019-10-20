@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 public class rsa_keygen {
 
-
     public static void main(String[] args) {
 
         if (args.length < 3) {
@@ -27,6 +26,7 @@ public class rsa_keygen {
         }
         BigInteger y = keygen.modInverse( x, fn);
         keygen.printValues(n, x, y, args[1], args[2]);
+        System.exit(0);
 
 
 //        System.out.println(x.modInverse(fn) + "done");
@@ -119,12 +119,20 @@ public class rsa_keygen {
         return x;
     }
 
+    /**
+     * This method will write the various calculated values to a files named in the original terminal command.
+     * @param pq the value of p * q
+     * @param x the value x
+     * @param y the value y
+     * @param outfile1 the directory of the file that will contain pq and x
+     * @param outfile2 the directory of the file that will contain pq and y
+     */
     public void printValues(BigInteger pq, BigInteger x, BigInteger y, String outfile1, String outfile2) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(outfile1));
             BufferedWriter writer2 = new BufferedWriter(new FileWriter(outfile2));
-            writer.write(pq.toString() + "\n" + x.toString());
-            writer2.write(pq.toString() + "\n" + y.toString());
+            writer.write(pq.toString() + " " + x.toString());
+            writer2.write(pq.toString() + " " + y.toString());
             writer.close();
             writer2.close();
         } catch (IOException e) {
