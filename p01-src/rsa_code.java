@@ -3,9 +3,9 @@ import java.math.BigInteger;
 public class rsa_code {
 
 
-    public static void Main(String[] args) {
+    public static void main(String[] args) {
         rsa_code rsa_code = new rsa_code();
-        BigInteger x = new BigInteger("78899");
+        BigInteger x = new BigInteger("16777215");
         System.out.println(findNearestPower256(x));
 
     }
@@ -31,7 +31,7 @@ public class rsa_code {
             if (blockSize.compareTo(x) == 0) {
                 return upperk;
             } else {
-                tempK = (upperk.subtract(lowerk)).divide(new BigInteger("2"));// tempk = (upperk - lowerk) /2
+                tempK = (upperk.add(lowerk)).divide(new BigInteger("2"));// tempk = (upperk - lowerk) /2
                 blockSize = get256toPowerK(tempK);
             }
             int compare = blockSize.compareTo(x);
