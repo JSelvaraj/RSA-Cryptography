@@ -26,7 +26,8 @@ public class rsa_keygenTest {
      * from a list of primes.
      */
     @Test
-    public void isPrimeCorrectInput() {
+    public void isCoprimeCorrectInput() {
+        System.out.println(y.toString());
         assertTrue(rsa_keygen.isCoprime(fn,x));
     }
 
@@ -34,7 +35,7 @@ public class rsa_keygenTest {
      * This checks that isPrime returns false if the two inputs aren't coprime. I chose two random even numbers to test.
      */
     @Test
-    public void isPrimeWrongInput() {
+    public void isCoprimeWrongInput() {
         assertFalse(rsa_keygen.isCoprime(new BigInteger("25893239058"), new BigInteger("2593802")));
     }
 
@@ -69,7 +70,7 @@ public class rsa_keygenTest {
     }
 
     /**
-     * This checks that the printValues file correctly prints the numbers
+     * This checks that the printValues file correctly prints the numbers to text files.
      * @throws FileNotFoundException
      */
     @Test
