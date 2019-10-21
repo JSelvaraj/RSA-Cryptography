@@ -2,6 +2,8 @@
   <dictionary name="js395">
     <words>
       <w>lowerbound</w>
+      <w>privatekey</w>
+      <w>publickey</w>
     </words>
   </dictionary>
 </component>

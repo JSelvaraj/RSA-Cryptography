@@ -1,7 +1,10 @@
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.math.BigInteger;
+import java.util.Scanner;
 
 import static org.junit.Assert.*;
 
@@ -24,7 +27,7 @@ public class rsa_keygenTest {
      */
     @Test
     public void isPrimeCorrectInput() {
-        assertTrue(rsa_keygen.isPrime(fn,x));
+        assertTrue(rsa_keygen.isCoprime(fn,x));
     }
 
     /**
@@ -32,7 +35,7 @@ public class rsa_keygenTest {
      */
     @Test
     public void isPrimeWrongInput() {
-        assertFalse(rsa_keygen.isPrime(new BigInteger("25893239058"), new BigInteger("2593802")));
+        assertFalse(rsa_keygen.isCoprime(new BigInteger("25893239058"), new BigInteger("2593802")));
     }
 
     /**
@@ -49,9 +52,40 @@ public class rsa_keygenTest {
      * this test class.
      */
     @Test
-    public void readInValuesCorrect() {
+    public void readInValuesCorrect() throws FileNotFoundException {
         BigInteger[] array = {p, q, x};
+        assertEquals(rsa_keygen.readInValues("Tests/test1")[0], array[0]);
+        assertEquals(rsa_keygen.readInValues("Tests/test1")[1], array[1]);
+        assertEquals(rsa_keygen.readInValues("Tests/test1")[2], array[2]);
+    }
 
+    /**
+     * This function checks that the correct error is thrown if the input file doesn't exist.
+     * @throws FileNotFoundException
+     */
+    @Test(expected = FileNotFoundException.class)
+    public void readInValuesNoFile() throws FileNotFoundException {
+        rsa_keygen.readInValues("noFileExists");
+    }
+
+    /**
+     * This checks that the printValues file correctly prints the numbers
+     * @throws FileNotFoundException
+     */
+    @Test
+    public void outputFiles() throws FileNotFoundException {
+        rsa_keygen.printValues(n, x, y, "out1", "out2");
+        Scanner scanner1 = new Scanner(new FileReader("out1"));
+        BigInteger pq = new BigInteger(scanner1.next());
+        BigInteger publickey = new BigInteger(scanner1.next());
+        scanner1.close();
+        assertEquals(pq, n);
+        assertEquals(publickey, x);
+        Scanner scanner2 = new Scanner(new FileReader("out2"));
+        pq = new BigInteger(scanner2.next());
+        BigInteger privatekey = new BigInteger(scanner2.next());
+        assertEquals(pq, n);
+        assertEquals(y, privatekey);
     }
 
 
