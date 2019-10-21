@@ -9,22 +9,21 @@ public class rsa_keygen {
             System.err.println("Usage:  rsa_keygen infile outfile1 outfile2");
             System.exit(-1);
         }
-        rsa_keygen keygen = new rsa_keygen();
 //        BigInteger test_val_1 = new BigInteger("15");
 //        BigInteger test_val_2 = new BigInteger("3");
 //        BigInteger test_val_3 = new BigInteger("5");
-        BigInteger[] values = keygen.readInValues(args[0]);
+        BigInteger[] values = readInValues(args[0]);
         BigInteger p = values[0];
         BigInteger q = values[1];
         BigInteger x = values[2];
         BigInteger n = p.multiply(q);
         BigInteger fn = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1")));
-        if (!keygen.isPrime(fn, x)) {
+        if (!isPrime(fn, x)) {
             System.err.println("Unsuitable exponent\n");
             System.exit(-1);
         }
-        BigInteger y = keygen.modInverse( x, fn);
-        keygen.printValues(n, x, y, args[1], args[2]);
+        BigInteger y = modInverse( x, fn);
+        printValues(n, x, y, args[1], args[2]);
         System.exit(0);
 
 
@@ -41,7 +40,7 @@ public class rsa_keygen {
      * @param n this value is equal to (p-1)(q-1)
      * @return true if e and (p-1)(q-1) are coprime and false if not
      */
-    private  boolean isPrime(BigInteger n, BigInteger x) {
+    public static  boolean isPrime(BigInteger n, BigInteger x) {
         return gcd(x, n).equals(new BigInteger("1"));
     }
 
@@ -51,7 +50,7 @@ public class rsa_keygen {
      * @param b (p-1)(q-1)
      * @return The greatest common divisor between a and b
      */
-    private BigInteger gcd(BigInteger a, BigInteger b) {
+    private static BigInteger gcd(BigInteger a, BigInteger b) {
         if (a.equals(new BigInteger("0"))) {
             return b ;
         }
@@ -63,7 +62,7 @@ public class rsa_keygen {
      * @param infile The input file containing p, q and x
      * @return a BigInteger array containing the 3 numbers from an input file. Null on a failure.
      */
-    private BigInteger[] readInValues(String infile) {
+    public static BigInteger[] readInValues(String infile) {
         try {
             String[] numbers = new String[3];
             BigInteger[] values = new BigInteger[3];
@@ -75,7 +74,7 @@ public class rsa_keygen {
             }
             return values;
         } catch (FileNotFoundException e) {
-            System.err.println("Unsuitable exponent\n");
+            System.err.println("File not Found\n");
             System.exit(-1);
         }
         return null;
@@ -88,7 +87,7 @@ public class rsa_keygen {
      * @param mod the mod value
      * @return the modular inverse of a
      */
-    private BigInteger modInverse(BigInteger a, BigInteger mod) {
+    public static BigInteger modInverse(BigInteger a, BigInteger mod) {
         BigInteger originalMod =  new BigInteger(mod.toByteArray());
         BigInteger y = new BigInteger("0");
         BigInteger x = new BigInteger(("1")); // will hold the modular inverse
@@ -123,7 +122,7 @@ public class rsa_keygen {
      * @param outfile1 the directory of the file that will contain pq and x
      * @param outfile2 the directory of the file that will contain pq and y
      */
-    private void printValues(BigInteger pq, BigInteger x, BigInteger y, String outfile1, String outfile2) {
+    public static void printValues(BigInteger pq, BigInteger x, BigInteger y, String outfile1, String outfile2) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(outfile1));
             BufferedWriter writer2 = new BufferedWriter(new FileWriter(outfile2));
