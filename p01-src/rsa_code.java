@@ -124,21 +124,17 @@ public class rsa_code {
                 BigInteger plaintextBlock = new BigInteger(1, array);
                 byte[] cipertextBlock = modularExponentiation(plaintextBlock, exponent, N).toByteArray();
 
-
-                /* This part writes the a 64 bit block with the count of plaintext blocks encoded */
+                /* This part writes the a 8 byte 'count' block with the count of plaintext blocks encoded */
                 long longcount = (long) count;
                 ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
                 buffer.putLong(longcount);
                 outputStream.write(buffer.array());
 
-
                 /* This part writes the ciphertext block to k + 1 bytes in outfile */
                 outputStream.write(new byte[(k + 1) - cipertextBlock.length]);
                 outputStream.write(cipertextBlock);
 
-
-
-                /* resets the byte array and  */
+                /* resets the byte array and reads a new set of plaintext */
                 array = new byte[k];
                 count = inputStream.read(array);
                 if (count < k && count != -1) { // If the last set of octets is smaller than k it ensure the byte array doesn't have trailing 0's
@@ -155,10 +151,10 @@ public class rsa_code {
      * This function recursively calculates a^exponent mod mod. If the exponent is odd it recursively calls itself again with one less exponent
      * the result is then multiplied with a. If the exponent is even it recursively calls itself but divides the exponent by 2
      *
-     * @param a
-     * @param exponent
-     * @param mod
-     * @return
+     * @param a the number being powered
+     * @param exponent the number 'a' is being powered to
+     * @param mod the modulus
+     * @return a^exponent mod 'mod'
      */
     private BigInteger modularExponentiation(BigInteger a, BigInteger exponent, BigInteger mod) {
         if (exponent.compareTo(new BigInteger("1")) == 0) {
@@ -178,23 +174,28 @@ public class rsa_code {
      */
     public void decode(BigInteger N, BigInteger exponent) {
         try {
+            /* Reads the first 8 bytes to get the k value */
             byte[] kArray = new byte[8];
             byte[] intkArray;
-            int count = inputStream.read(kArray); //reads in first 64bit count block
+            int count = inputStream.read(kArray);
+
+            /* converts k from an 8 byte long to a 4 byte int  */
             ByteBuffer buffer = ByteBuffer.allocate(4);
             intkArray = Arrays.copyOfRange(kArray, 4, 8);
             buffer.put(intkArray);
             int expectedNumberOfbytes = buffer.getInt(0);
-            /* The first instance of k should be the (length - 1)
-            of each ciphertext blocks (even the last one) */
+
+            /* The first instance of k should be the length - 1 of the cipher text blocks we need to read */
             int k = expectedNumberOfbytes;
 
-
             while (count > -1) {
+
                 if (count < 8) {
                     System.err.println("Improperly Formatted input\n");
                     System.exit(-1);
                 }
+
+                /* Reads the first k bytes, decodes it and checks that the decoding is valid */
                 byte[] cipherArray = new byte[k + 1];
                 inputStream.read(cipherArray);
                 BigInteger ciphertextBlock = new BigInteger(1, cipherArray);
@@ -208,8 +209,8 @@ public class rsa_code {
                 }
                 outputStream.write(plaintextBytes);
 
+                /* reads the next count block */
                 count = inputStream.read(kArray);
-
                 buffer = ByteBuffer.allocate(4);
                 intkArray = Arrays.copyOfRange(kArray, 4, 8);
                 buffer.put(intkArray);
@@ -226,8 +227,8 @@ public class rsa_code {
     /**
      * this is a helper function that reads in the keyfile and gives an array containing the mod and the public/private key
      * separated by a whitespace.
-     * @param infile
-     * @return
+     * @param infile the keyfile.
+     * @return an array containing the N value and the exponent value
      */
     private BigInteger[] readInValues(String infile) {
         try {
