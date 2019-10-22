@@ -23,7 +23,7 @@ class rsa_codeTest {
     @Test
     void decode() {
         rsa_code rsa_code = new rsa_code("outfile", "result");
-        rsa_code.decode(new BigInteger("78899"), new BigInteger("62669"));
+        rsa_code.decode(new BigInteger("78899"),2, new BigInteger("62669"));
     }
 
 

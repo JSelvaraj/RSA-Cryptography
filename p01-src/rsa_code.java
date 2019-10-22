@@ -40,7 +40,7 @@ public class rsa_code {
                 }
                 rsa_code = new rsa_code(args[2], args[3]);
                 values = rsa_code.readInValues(args[1]);
-                rsa_code.decode(values[0], values[1]);
+                rsa_code.decode(values[0], rsa_code.findNearestPower256(values[0]), values[1]);
                 break;
             default:
                 System.out.println("Usage: rsa-code [-d] keyfile message output");
@@ -121,6 +121,7 @@ public class rsa_code {
             byte[] array = new byte[k];
             int count = inputStream.read(array);
             while (count != -1) {
+                array = Arrays.copyOfRange(array, 0, count);
                 BigInteger plaintextBlock = new BigInteger(1, array);
                 byte[] cipertextBlock = modularExponentiation(plaintextBlock, exponent, N).toByteArray();
 
@@ -141,6 +142,7 @@ public class rsa_code {
                     array = Arrays.copyOfRange(array, 0, count);
                 }
             }
+//            outputStream.write('\n');
         } catch (IOException e) {
             System.err.println("Message not Found\n");
             System.exit(-1);
@@ -151,14 +153,16 @@ public class rsa_code {
      * This function recursively calculates a^exponent mod mod. If the exponent is odd it recursively calls itself again with one less exponent
      * the result is then multiplied with a. If the exponent is even it recursively calls itself but divides the exponent by 2
      *
-     * @param a the number being powered
+     * @param a        the number being powered
      * @param exponent the number 'a' is being powered to
-     * @param mod the modulus
+     * @param mod      the modulus
      * @return a^exponent mod 'mod'
      */
     private BigInteger modularExponentiation(BigInteger a, BigInteger exponent, BigInteger mod) {
         if (exponent.compareTo(new BigInteger("1")) == 0) {
             return a;
+        } else if (exponent.compareTo(new BigInteger("0")) == 0) {
+            return new BigInteger("1");
         } else if ((exponent.mod(new BigInteger("2"))).compareTo(new BigInteger("0")) == 0) { //if exponent is even
             BigInteger k = modularExponentiation(a, exponent.divide(new BigInteger("2")), mod);
             return (k.multiply(k)).mod(mod);
@@ -172,35 +176,30 @@ public class rsa_code {
      * @param N        The mod
      * @param exponent the private key number
      */
-    public void decode(BigInteger N, BigInteger exponent) {
+    public void decode(BigInteger N, int k, BigInteger exponent) {
         try {
             /* Reads the first 8 bytes to get the k value */
             byte[] kArray = new byte[8];
             byte[] intkArray;
             int count = inputStream.read(kArray);
-
+            if (count < 8) {
+                System.err.println("Improperly Formatted input\n");
+                System.exit(-1);
+            }
             /* converts k from an 8 byte long to a 4 byte int  */
             ByteBuffer buffer = ByteBuffer.allocate(4);
             intkArray = Arrays.copyOfRange(kArray, 4, 8);
             buffer.put(intkArray);
             int expectedNumberOfbytes = buffer.getInt(0);
 
-            /* The first instance of k should be the length - 1 of the cipher text blocks we need to read */
-            int k = expectedNumberOfbytes;
-
             while (count > -1) {
-
-                if (count < 8) {
-                    System.err.println("Improperly Formatted input\n");
-                    System.exit(-1);
-                }
-
                 /* Reads the first k bytes, decodes it and checks that the decoding is valid */
                 byte[] cipherArray = new byte[k + 1];
                 inputStream.read(cipherArray);
-                BigInteger ciphertextBlock = new BigInteger(1, cipherArray);
+                BigInteger ciphertextBlock = new BigInteger(cipherArray);
                 BigInteger plaintext = modularExponentiation(ciphertextBlock, exponent, N);
                 byte[] plaintextBytes = plaintext.toByteArray();
+                if (plaintextBytes[0] == 0) plaintextBytes = Arrays.copyOfRange(plaintextBytes, 1, plaintextBytes.length); // sometimes byte[1] is a negative number because byte[0] was 1, this translates to a 0 block in the plaintext bytes
                 if (plaintext.compareTo(N) > -1 ||
                         plaintextBytes.length > expectedNumberOfbytes ||
                         ciphertextBlock.compareTo(N) > -1) { // if plaintext > N
@@ -218,15 +217,19 @@ public class rsa_code {
 
             }
 
+//            outputStream.write('\n');
+
         } catch (IOException e) {
             System.err.println("Improperly Formatted input\n");
             System.exit(-1);
         }
+
     }
 
     /**
      * this is a helper function that reads in the keyfile and gives an array containing the mod and the public/private key
      * separated by a whitespace.
+     *
      * @param infile the keyfile.
      * @return an array containing the N value and the exponent value
      */
