@@ -1,10 +1,14 @@
+import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.math.BigInteger;
 import java.util.Scanner;
+
 import static org.junit.Assert.*;
 
 public class rsa_keygenTest {
@@ -26,24 +30,6 @@ public class rsa_keygenTest {
      */
     @Test
     public void isCoprimeCorrectInput() {
-
-//        byte[] array = new byte[3];
-//        array[0] = 1;
-//        array[1] = 5;
-//        array[2] = 1;
-////        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-////        buffer.put(array);
-////        buffer.flip();
-////        BigInteger i = new BigInteger(buffer.array());
-////        System.out.println(buffer.getLong());
-//
-//        try {
-//            FileOutputStream writer = new FileOutputStream("infile");
-//            writer.write(array);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
 
         assertTrue(rsa_keygen.isCoprime(fn,x));
     }
@@ -106,6 +92,12 @@ public class rsa_keygenTest {
         BigInteger privatekey = new BigInteger(scanner2.next());
         assertEquals(pq, n);
         assertEquals(y, privatekey);
+    }
+
+    @AfterClass
+    public static void cleanup() {
+        FileUtils.deleteQuietly(new File("out1"));
+        FileUtils.deleteQuietly(new File("out1"));
     }
 
 

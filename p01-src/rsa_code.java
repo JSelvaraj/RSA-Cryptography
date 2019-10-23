@@ -128,6 +128,7 @@ public class rsa_code {
                 array = Arrays.copyOfRange(array, 0, count);
 
                 BigInteger plaintextBlock = new BigInteger(1, array);
+                BigInteger ciphertext = modularExponentiation(plaintextBlock, exponent, N);
                 byte[] cipertextBlock = modularExponentiation(plaintextBlock, exponent, N).toByteArray();
 
                 /* This part writes the a 8 byte 'count' block with the count of plaintext blocks encoded */
@@ -181,6 +182,7 @@ public class rsa_code {
     public void decode(BigInteger N, int k, BigInteger exponent) {
         try {
             /* Reads the first 8 bytes to get the k value */
+
             byte[] kArray = new byte[8];
             byte[] intkArray;
             int count = inputStream.read(kArray);
@@ -198,17 +200,24 @@ public class rsa_code {
                 /* Reads the first k bytes, decodes it and checks that the decoding is valid */
                 byte[] cipherArray = new byte[k + 1];
                 inputStream.read(cipherArray);
-                BigInteger ciphertextBlock = new BigInteger(cipherArray);
+                BigInteger ciphertextBlock = new BigInteger(1, cipherArray);
                 /* Decodes the first k blocks using modular exponentiation */
                 BigInteger plaintext = modularExponentiation(ciphertextBlock, exponent, N);
                 byte[] plaintextBytes = plaintext.toByteArray();
-                if (plaintextBytes[0] == 0) plaintextBytes = Arrays.copyOfRange(plaintextBytes, 1, plaintextBytes.length); // sometimes byte[1] is a negative number because byte[0] was 1, this translates to a 0 block in the plaintext bytes
+                if (plaintext.compareTo(new BigInteger("0")) == 0) {
+                    plaintextBytes = new byte[expectedNumberOfbytes];
+                }
+                else if (plaintextBytes[0] == 0 && plaintextBytes.length > expectedNumberOfbytes) {
+                    plaintextBytes = Arrays.copyOfRange(plaintextBytes, 1, plaintextBytes.length); // sometimes byte[1] is a negative number because byte[0] was 1, this translates to a 0 block in the plaintext bytes
+
+                }
                 if (plaintext.compareTo(N) > -1 ||
                         plaintextBytes.length > expectedNumberOfbytes ||
                         ciphertextBlock.compareTo(N) > -1) { // if plaintext > N
                     System.err.println("Incorrect input");
                     System.exit(-1);
                 }
+                outputStream.write(new byte[expectedNumberOfbytes-plaintextBytes.length]);
                 outputStream.write(plaintextBytes);
 
                 /* reads the next count block */
@@ -247,8 +256,8 @@ public class rsa_code {
                 values[i] = new BigInteger(numbers[i]);
             }
             if (values[0].compareTo(new BigInteger("256")) < 0 || values[1].compareTo(new BigInteger("0")) < 0) { // if N < 256 or exponent is negative
-                System.err.println("Input error");
-
+                System.err.println("Input error: N too small or exponent is negative");
+                System.exit(-1);
             }
             return values;
         } catch (FileNotFoundException e) {

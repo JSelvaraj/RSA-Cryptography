@@ -27,7 +27,6 @@ public class rsa_keygen {
         }
         BigInteger publickey = modInverse(privatekey, fn);
         printValues(n, privatekey, publickey, args[1], args[2]);
-        System.exit(0);
     }
 
     /**
