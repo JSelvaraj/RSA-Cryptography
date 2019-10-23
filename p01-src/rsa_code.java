@@ -66,21 +66,24 @@ public class rsa_code {
         int lowerk = 1;
         int upperk = 1;
 
-        while (blockSize.compareTo(x) < 0) {
+        /* This establishes an upper limit and a lower limit to find k*/
+        while (blockSize.compareTo(x) < 0) { // if blocksize <= x
             blockSize = blockSize.multiply(blockSize);
             upperk = upperk * 2;
-            lowerk = upperk / 2;
         }
+        lowerk = upperk / 2;
 
-        while ((upperk - lowerk) != 1) { // (upperk-lowerk) != 1
+        /* a modified binary search algorithm to find k */
+        while ((upperk - lowerk) != 1) { // while the difference between the limits isn't one.
             int tempK;
-            if (blockSize.compareTo(x) == 0) {
+            if (blockSize.compareTo(x) == 0) { // if blockSize == x
                 return upperk;
             } else {
                 tempK = (upperk + lowerk) / 2; // tempk = (upperk - lowerk) /2
                 blockSize = repeatedSquaring(tempK);
             }
             int compare = blockSize.compareTo(x);
+            /* This compares the current power of 256 to k and adjusts the limit according to whether the power its larger, smaller or equal to */
             if (compare >= 1) {
                 upperk = tempK;
             } else if (compare <= -1) {
@@ -121,7 +124,9 @@ public class rsa_code {
             byte[] array = new byte[k];
             int count = inputStream.read(array);
             while (count != -1) {
+                /* this ensures that when it gets tot he last block of plaintext, it only encrypts the correct bytes */
                 array = Arrays.copyOfRange(array, 0, count);
+
                 BigInteger plaintextBlock = new BigInteger(1, array);
                 byte[] cipertextBlock = modularExponentiation(plaintextBlock, exponent, N).toByteArray();
 
@@ -138,9 +143,6 @@ public class rsa_code {
                 /* resets the byte array and reads a new set of plaintext */
                 array = new byte[k];
                 count = inputStream.read(array);
-                if (count < k && count != -1) { // If the last set of octets is smaller than k it ensure the byte array doesn't have trailing 0's
-                    array = Arrays.copyOfRange(array, 0, count);
-                }
             }
 //            outputStream.write('\n');
         } catch (IOException e) {
@@ -159,9 +161,9 @@ public class rsa_code {
      * @return a^exponent mod 'mod'
      */
     private BigInteger modularExponentiation(BigInteger a, BigInteger exponent, BigInteger mod) {
-        if (exponent.compareTo(new BigInteger("1")) == 0) {
+        if (exponent.compareTo(new BigInteger("1")) == 0) { // base case 1: if exponent == 1
             return a;
-        } else if (exponent.compareTo(new BigInteger("0")) == 0) {
+        } else if (exponent.compareTo(new BigInteger("0")) == 0) { // base case 2: if exponent == 0
             return new BigInteger("1");
         } else if ((exponent.mod(new BigInteger("2"))).compareTo(new BigInteger("0")) == 0) { //if exponent is even
             BigInteger k = modularExponentiation(a, exponent.divide(new BigInteger("2")), mod);
@@ -197,6 +199,7 @@ public class rsa_code {
                 byte[] cipherArray = new byte[k + 1];
                 inputStream.read(cipherArray);
                 BigInteger ciphertextBlock = new BigInteger(cipherArray);
+                /* Decodes the first k blocks using modular exponentiation */
                 BigInteger plaintext = modularExponentiation(ciphertextBlock, exponent, N);
                 byte[] plaintextBytes = plaintext.toByteArray();
                 if (plaintextBytes[0] == 0) plaintextBytes = Arrays.copyOfRange(plaintextBytes, 1, plaintextBytes.length); // sometimes byte[1] is a negative number because byte[0] was 1, this translates to a 0 block in the plaintext bytes
@@ -210,7 +213,7 @@ public class rsa_code {
 
                 /* reads the next count block */
                 count = inputStream.read(kArray);
-                buffer = ByteBuffer.allocate(4);
+                buffer = ByteBuffer.allocate(4); // resets the buffer
                 intkArray = Arrays.copyOfRange(kArray, 4, 8);
                 buffer.put(intkArray);
                 expectedNumberOfbytes = buffer.getInt(0);

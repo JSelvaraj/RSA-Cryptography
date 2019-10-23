@@ -2,13 +2,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.Scanner;
-
 import static org.junit.Assert.*;
 
 public class rsa_keygenTest {
@@ -76,9 +72,9 @@ public class rsa_keygenTest {
     @Test
     public void readInValuesCorrect() throws FileNotFoundException {
         BigInteger[] array = {p, q, x};
-        assertEquals(rsa_keygen.readInValues("Tests/test1")[0], array[0]);
-        assertEquals(rsa_keygen.readInValues("Tests/test1")[1], array[1]);
-        assertEquals(rsa_keygen.readInValues("Tests/test1")[2], array[2]);
+        assertEquals(rsa_keygen.readInValues("p01-src/test1")[0], array[0]);
+        assertEquals(rsa_keygen.readInValues("p01-src/test1")[1], array[1]);
+        assertEquals(rsa_keygen.readInValues("p01-src/test1")[2], array[2]);
     }
 
     /**
