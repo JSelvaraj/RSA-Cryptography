@@ -16,17 +16,21 @@ public class rsa_keygen {
             System.err.println("File not Found\n");
             System.exit(-1);
         }
+
+//        /* Putting values from input into separate variables for easier use and legibility. */
         BigInteger p = values[0];
         BigInteger q = values[1];
         BigInteger privatekey = values[2];
         BigInteger n = p.multiply(q);
         BigInteger fn = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1"))); // (p-1)(q-1)
+
         if (!isCoprime(fn, privatekey)) {
             System.err.println("Unsuitable exponent\n");
             System.exit(-1);
         }
         BigInteger publickey = modInverse(privatekey, fn);
         printValues(n, privatekey, publickey, args[1], args[2]);
+//        System.exit(0);
     }
 
     /**
@@ -125,8 +129,9 @@ public class rsa_keygen {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(outfile1));
             BufferedWriter writer2 = new BufferedWriter(new FileWriter(outfile2));
-            writer.write(pq.toString() + " " + x.toString());
-            writer2.write(pq.toString() + " " + y.toString());
+            writer.write(pq.toString() + " " + x.toString() + '\n');
+            writer2.write(pq.toString() + " " + y.toString() + '\n');
+
             writer.close();
             writer2.close();
         } catch (IOException e) {

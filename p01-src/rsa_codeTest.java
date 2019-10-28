@@ -155,7 +155,7 @@ public class rsa_codeTest {
         FileUtils.deleteQuietly(new File("out2"));
         FileUtils.deleteQuietly(new File("c1"));
         FileUtils.deleteQuietly(new File("pic.jpg"));
-        FileUtils.deleteQuietly(new File("p1"));
+//        FileUtils.deleteQuietly(new File("p1"));
     }
 
 }

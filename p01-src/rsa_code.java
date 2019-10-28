@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Scanner;
 
+
 public class rsa_code {
 
     FileOutputStream outputStream;
@@ -135,10 +136,17 @@ public class rsa_code {
                 long longcount = (long) count;
                 ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
                 buffer.putLong(longcount);
-                outputStream.write(buffer.array());
+                byte[] size = buffer.array();
+                for (int i = 7; i >= 0; i--) {
+                    outputStream.write(size[i]);
+                }
 
                 /* This part writes the ciphertext block to k + 1 bytes in outfile */
-                outputStream.write(new byte[(k + 1) - cipertextBlock.length]);
+                if (cipertextBlock.length <= k + 1) {
+                    outputStream.write(new byte[(k + 1) - cipertextBlock.length]);
+                } else {
+                    outputStream.write(cipertextBlock, 1,cipertextBlock.length);
+                }
                 outputStream.write(cipertextBlock);
 
                 /* resets the byte array and reads a new set of plaintext */
@@ -184,15 +192,20 @@ public class rsa_code {
             /* Reads the first 8 bytes to get the k value */
 
             byte[] kArray = new byte[8];
+            byte[] reversekArray = new byte[8];
             byte[] intkArray;
             int count = inputStream.read(kArray);
+            for (int i = 7; i >= 0; i--) {
+                reversekArray[7-i] = kArray[i];
+            }
+//            ArrayUtils.reverse(kArray);
             if (count < 8) {
                 System.err.println("Improperly Formatted input\n");
                 System.exit(-1);
             }
             /* converts k from an 8 byte long to a 4 byte int  */
             ByteBuffer buffer = ByteBuffer.allocate(4);
-            intkArray = Arrays.copyOfRange(kArray, 4, 8);
+            intkArray = Arrays.copyOfRange(reversekArray, 4, 8);
             buffer.put(intkArray);
             int expectedNumberOfbytes = buffer.getInt(0);
 
@@ -222,15 +235,18 @@ public class rsa_code {
 
                 /* reads the next count block */
                 count = inputStream.read(kArray);
+                for (int i = 7; i >= 0; i--) {
+                    reversekArray[7-i] = kArray[i];
+                }
                 buffer = ByteBuffer.allocate(4); // resets the buffer
-                intkArray = Arrays.copyOfRange(kArray, 4, 8);
+                intkArray = Arrays.copyOfRange(reversekArray, 4, 8);
                 buffer.put(intkArray);
                 expectedNumberOfbytes = buffer.getInt(0);
 
             }
 
 //            outputStream.write('\n');
-
+            outputStream.close();
         } catch (IOException e) {
             System.err.println("Improperly Formatted input\n");
             System.exit(-1);
