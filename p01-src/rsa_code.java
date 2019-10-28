@@ -145,9 +145,10 @@ public class rsa_code {
                 if (cipertextBlock.length <= k + 1) {
                     outputStream.write(new byte[(k + 1) - cipertextBlock.length]);
                 } else {
-                    outputStream.write(cipertextBlock, 1,cipertextBlock.length);
+//                    outputStream.write(cipertextBlock, 1, cipertextBlock.length);
                 }
                 outputStream.write(cipertextBlock);
+
 
                 /* resets the byte array and reads a new set of plaintext */
                 array = new byte[k];
@@ -172,11 +173,11 @@ public class rsa_code {
     private BigInteger modularExponentiation(BigInteger a, BigInteger exponent, BigInteger mod) {
 
 
-        BigInteger result = new BigInteger("1");
+        BigInteger result = BigInteger.ONE;
 
-        while ( exponent.compareTo(new BigInteger("0")) > 0) {
+        while (exponent.compareTo(BigInteger.ZERO) > 0) {
             /* If there's a 1 in the bit string the result multiplied by a power of a */
-            if ((exponent.and(new BigInteger("1")).compareTo(new BigInteger("1"))) == 0) {
+            if ((exponent.and(BigInteger.ONE).compareTo(BigInteger.ONE)) == 0) {
                 result = (result.multiply(a)).mod(mod);
             }
             /* Checks moves along the bit string representing the exponent */
@@ -187,16 +188,15 @@ public class rsa_code {
         return result;
 
 
-
-//        if (exponent.compareTo(new BigInteger("1")) == 0) { // base case 1: if exponent == 1
+//        if (exponent.compareTo(BigInteger.ONE) == 0) { // base case 1: if exponent == 1
 //            return a;
-//        } else if (exponent.compareTo(new BigInteger("0")) == 0) { // base case 2: if exponent == 0
-//            return new BigInteger("1");
-//        } else if ((exponent.mod(new BigInteger("2"))).compareTo(new BigInteger("0")) == 0) { //if exponent is even
+//        } else if (exponent.compareTo(BigInteger.ZERO) == 0) { // base case 2: if exponent == 0
+//            return BigInteger.ONE;
+//        } else if ((exponent.mod(new BigInteger("2"))).compareTo(BigInteger.ZERO) == 0) { //if exponent is even
 //            BigInteger k = modularExponentiation(a, exponent.divide(new BigInteger("2")), mod);
 //            return (k.multiply(k)).mod(mod);
 //        } else { //if exponent is odd
-//            BigInteger k = modularExponentiation(a, (exponent.subtract(new BigInteger("1"))).divide(new BigInteger("2")), mod);
+//            BigInteger k = modularExponentiation(a, (exponent.subtract(BigInteger.ONE)).divide(new BigInteger("2")), mod);
 //            return (((k.multiply(k)).mod(mod)).multiply(a)).mod(mod);
 //        }
     }
@@ -214,7 +214,7 @@ public class rsa_code {
             byte[] intkArray;
             int count = inputStream.read(kArray);
             for (int i = 7; i >= 0; i--) {
-                reversekArray[7-i] = kArray[i];
+                reversekArray[7 - i] = kArray[i];
             }
 //            ArrayUtils.reverse(kArray);
             if (count < 8) {
@@ -235,10 +235,9 @@ public class rsa_code {
                 /* Decodes the first k blocks using modular exponentiation */
                 BigInteger plaintext = modularExponentiation(ciphertextBlock, exponent, N);
                 byte[] plaintextBytes = plaintext.toByteArray();
-                if (plaintext.compareTo(new BigInteger("0")) == 0) {
+                if (plaintext.compareTo(BigInteger.ZERO) == 0) {
                     plaintextBytes = new byte[expectedNumberOfbytes];
-                }
-                else if (plaintextBytes[0] == 0 && plaintextBytes.length > expectedNumberOfbytes) {
+                } else if (plaintextBytes[0] == 0 && plaintextBytes.length > expectedNumberOfbytes) {
                     plaintextBytes = Arrays.copyOfRange(plaintextBytes, 1, plaintextBytes.length); // sometimes byte[1] is a negative number because byte[0] was 1, this translates to a 0 block in the plaintext bytes
 
                 }
@@ -248,13 +247,13 @@ public class rsa_code {
                     System.err.println("Incorrect input");
                     System.exit(-1);
                 }
-                outputStream.write(new byte[expectedNumberOfbytes-plaintextBytes.length]);
+                outputStream.write(new byte[expectedNumberOfbytes - plaintextBytes.length]);
                 outputStream.write(plaintextBytes);
 
                 /* reads the next count block */
                 count = inputStream.read(kArray);
                 for (int i = 7; i >= 0; i--) {
-                    reversekArray[7-i] = kArray[i];
+                    reversekArray[7 - i] = kArray[i];
                 }
                 buffer = ByteBuffer.allocate(4); // resets the buffer
                 intkArray = Arrays.copyOfRange(reversekArray, 4, 8);
@@ -289,7 +288,7 @@ public class rsa_code {
                 numbers[i] = scanner.next();
                 values[i] = new BigInteger(numbers[i]);
             }
-            if (values[0].compareTo(new BigInteger("256")) < 0 || values[1].compareTo(new BigInteger("0")) < 0) { // if N < 256 or exponent is negative
+            if (values[0].compareTo(new BigInteger("256")) < 0 || values[1].compareTo(BigInteger.ZERO) < 0) { // if N < 256 or exponent is negative
                 System.err.println("Input error: N too small or exponent is negative");
                 System.exit(-1);
             }

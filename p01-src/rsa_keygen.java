@@ -22,7 +22,7 @@ public class rsa_keygen {
         BigInteger q = values[1];
         BigInteger privatekey = values[2];
         BigInteger n = p.multiply(q);
-        BigInteger fn = (p.subtract(new BigInteger("1"))).multiply(q.subtract(new BigInteger("1"))); // (p-1)(q-1)
+        BigInteger fn = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE)); // (p-1)(q-1)
 
         if (!isCoprime(fn, privatekey)) {
             System.err.println("Unsuitable exponent\n");
@@ -41,7 +41,7 @@ public class rsa_keygen {
      * @return true if e and (p-1)(q-1) are coprime and false if not
      */
     public static boolean isCoprime(BigInteger n, BigInteger x) {
-        return gcd(x, n).equals(new BigInteger("1"));
+        return gcd(x, n).equals(BigInteger.ONE);
     }
 
 
@@ -53,7 +53,7 @@ public class rsa_keygen {
      * @return The greatest common divisor between a and b
      */
     private static BigInteger gcd(BigInteger a, BigInteger b) {
-        if (a.equals(new BigInteger("0"))) {
+        if (a.equals(BigInteger.ZERO)) {
             return b;
         }
         return gcd(b.mod(a), a);
@@ -91,15 +91,15 @@ public class rsa_keygen {
      */
     public static BigInteger modInverse(BigInteger exponent, BigInteger mod) {
         BigInteger originalMod = new BigInteger(mod.toByteArray());
-        BigInteger y = new BigInteger("0");
-        BigInteger x = new BigInteger(("1")); // will hold the modular inverse
+        BigInteger y = BigInteger.ZERO;
+        BigInteger x = BigInteger.ONE; // will hold the modular inverse
 
-        if (mod.equals(new BigInteger("1"))) {
-            return new BigInteger("0");
+        if (mod.equals(BigInteger.ONE)) {
+            return BigInteger.ZERO;
         }
         /* this while loop iteratively does the euclidean algorithm while updating
         a value 'x' that will eventually be the modular inverse of a */
-        while (exponent.compareTo(new BigInteger("1")) > 0) {
+        while (exponent.compareTo(BigInteger.ONE) > 0) {
             BigInteger quotient = exponent.divide(mod);
             BigInteger t = mod;
 
@@ -110,7 +110,7 @@ public class rsa_keygen {
             y = x.subtract(quotient.multiply(y));
             x = t;
         }
-        if (x.compareTo(new BigInteger("0")) < 0) {
+        if (x.compareTo(BigInteger.ZERO) < 0) {
             x = x.add(originalMod);
         }
         return x;
