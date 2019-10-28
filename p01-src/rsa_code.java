@@ -170,17 +170,35 @@ public class rsa_code {
      * @return a^exponent mod 'mod'
      */
     private BigInteger modularExponentiation(BigInteger a, BigInteger exponent, BigInteger mod) {
-        if (exponent.compareTo(new BigInteger("1")) == 0) { // base case 1: if exponent == 1
-            return a;
-        } else if (exponent.compareTo(new BigInteger("0")) == 0) { // base case 2: if exponent == 0
-            return new BigInteger("1");
-        } else if ((exponent.mod(new BigInteger("2"))).compareTo(new BigInteger("0")) == 0) { //if exponent is even
-            BigInteger k = modularExponentiation(a, exponent.divide(new BigInteger("2")), mod);
-            return (k.multiply(k)).mod(mod);
-        } else { //if exponent is odd
-            BigInteger k = modularExponentiation(a, (exponent.subtract(new BigInteger("1"))).divide(new BigInteger("2")), mod);
-            return (((k.multiply(k)).mod(mod)).multiply(a)).mod(mod);
+
+
+        BigInteger result = new BigInteger("1");
+
+        while ( exponent.compareTo(new BigInteger("0")) > 0) {
+            /* If there's a 1 in the bit string the result multiplied by a power of a */
+            if ((exponent.and(new BigInteger("1")).compareTo(new BigInteger("1"))) == 0) {
+                result = (result.multiply(a)).mod(mod);
+            }
+            /* Checks moves along the bit string representing the exponent */
+            exponent = exponent.shiftRight(1);
+            /* Because each 1 represents a higher power of 2, the initial value has to be squared */
+            a = (a.multiply(a)).mod(mod);
         }
+        return result;
+
+
+
+//        if (exponent.compareTo(new BigInteger("1")) == 0) { // base case 1: if exponent == 1
+//            return a;
+//        } else if (exponent.compareTo(new BigInteger("0")) == 0) { // base case 2: if exponent == 0
+//            return new BigInteger("1");
+//        } else if ((exponent.mod(new BigInteger("2"))).compareTo(new BigInteger("0")) == 0) { //if exponent is even
+//            BigInteger k = modularExponentiation(a, exponent.divide(new BigInteger("2")), mod);
+//            return (k.multiply(k)).mod(mod);
+//        } else { //if exponent is odd
+//            BigInteger k = modularExponentiation(a, (exponent.subtract(new BigInteger("1"))).divide(new BigInteger("2")), mod);
+//            return (((k.multiply(k)).mod(mod)).multiply(a)).mod(mod);
+//        }
     }
 
     /**
